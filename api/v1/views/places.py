@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 '''
-Create a view for Place objects - handles all default RESTful API actions
+Create view for Place objects - handles all default RESTful API actions
 '''
 
-# Import necessary modules
+# Imports necessary modules
 from flask import abort, jsonify, request
-# Import the required models
+# Import required models
 from models.city import City
 from models.place import Place
 from models.state import State
@@ -15,115 +15,115 @@ from api.v1.views import app_views
 from models import storage
 
 
-# Route for retrieving all Place objects of a City
+# Route for retrieving Place objects of a City
 @app_views.route('/cities/<city_id>/places', methods=['GET'],
                  strict_slashes=False)
 def get_places_by_city(city_id):
     '''
-    Retrieves the list of all Place objects of a City
+    Retrieves list of Place objects of a City
     '''
-    # Get the City object with the given ID from the storage
+    # Get City object with given ID from storage
     city = storage.get(City, city_id)
     if not city:
-        # Return 404 error if the City object is not found
+        # Return 404 error if City object not found
         abort(404)
 
-    # Get all Place objects of the City and convert them to dictionaries
+    # Get Place objects of City and convert them to dictionaries
     places = [place.to_dict() for place in city.places]
     return jsonify(places)
 
 
-# Route for retrieving a specific Place object by ID
+# Route for retrieving specific Place object by ID
 @app_views.route('/places/<place_id>', methods=['GET'],
                  strict_slashes=False)
 def get_place(place_id):
     '''
-    Retrieves a Place object
+    Retrieves Place object
     '''
-    # Get the Place object with the given ID from the storage
+    # Get Place object with given ID from storage
     place = storage.get(Place, place_id)
     if place:
-        # Return the Place object in JSON format
+        # Return Place object in JSON format
         return jsonify(place.to_dict())
     else:
-        # Return 404 error if the Place object is not found
+        # Return 404 error if Place object is not found
         abort(404)
 
 
-# Route for deleting a specific Place object by ID
+# Route for deleting specific Place object by ID
 @app_views.route('/places/<place_id>', methods=['DELETE'])
 def delete_place(place_id):
     '''
-    Deletes a Place object
+    Deletes Place object
     '''
-    # Get the Place object with the given ID from the storage
+    # Get Place object with given ID from storage
     place = storage.get(Place, place_id)
     if place:
-        # Delete the Place object from the storage and save changes
+        # Delete Place object from storage and save changes
         storage.delete(place)
         storage.save()
         # Return an empty JSON with 200 status code
         return jsonify({}), 200
     else:
-        # Return 404 error if the Place object is not found
+        # Return 404 error if Place object not found
         abort(404)
 
 
-# Route for creating a new Place object
+# Route for creating new Place object
 @app_views.route('/cities/<city_id>/places', methods=['POST'],
                  strict_slashes=False)
 def create_place(city_id):
     '''
-    Creates a Place object
+    Creates Place object
     '''
-    # Get the City object with the given ID from the storage
+    # Get City object with given ID from storage
     city = storage.get(City, city_id)
     if not city:
-        # Return 404 error if the City object is not found
+        # Return 404 error if City object is not found
         abort(404)
 
-    # Check if the request data is in JSON format
+    # Check if request data in JSON format
     if not request.get_json():
-        # Return 400 error if the request data is not in JSON format
+        # Return 400 error if request data not in JSON format
         abort(400, 'Not a JSON')
 
-    # Get the JSON data from the request
+    # Get JSON data from request
     data = request.get_json()
     if 'user_id' not in data:
-        # Return 400 error if 'user_id' key is missing in the JSON data
+        # Return 400 error if 'user_id' key missing in JSON data
         abort(400, 'Missing user_id')
     if 'name' not in data:
-        # Return 400 error if 'name' key is missing in the JSON data
+        # Return 400 error if 'name' key missing in JSON data
         abort(400, 'Missing name')
 
-    # Get the User object with the given user_id from the storage
+    # Get User object with given user_id from storage
     user = storage.get(User, data['user_id'])
     if not user:
-        # Return 404 error if the User object is not found
+        # Return 404 error if User object is not found
         abort(404)
 
-    # Assign the city_id to the JSON data
+    # Assign city_id to JSON data
     data['city_id'] = city_id
-    # Create a new Place object with the JSON data
+    # Creat new Place object with JSON data
     place = Place(**data)
-    # Save the Place object to the storage
+    # Save Place object to storage
     place.save()
-    # Return the newly created Place object in JSON format with 201 status
+    # Return newly created Place object in JSON format 201 status
     return jsonify(place.to_dict()), 201
 
 
-# Route for updating an existing Place object by ID
+# Route updating existing Place object by ID
 @app_views.route('/places/<place_id>', methods=['PUT'], strict_slashes=False)
 def update_place(place_id):
     '''
-    Updates a Place object
+    Updates Place object
     '''
-    # Get the Place object with the given ID from the storage
+    # Get Place object with given ID from storage
     place = storage.get(Place, place_id)
     if place:
-        # Check if the request data is in JSON format
+        # Checks request data in JSON format
         if not request.get_json():
-            # Return 400 error if the request data is not in JSON format
+            # Return 400 error if request data not in JSON format
             abort(400, 'Not a JSON')
 
         # Get the JSON data from the request

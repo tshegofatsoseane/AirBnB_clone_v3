@@ -20,7 +20,7 @@ def get_all_amenities():
     return jsonify([amenity.to_dict() for amenity in amenities])
 
 
-# Route for retrieving a specific Amenity object by ID
+# Route for retrieving specific Amenity object by ID
 @app_views.route('/amenities/<amenity_id>',
                  methods=['GET'], strict_slashes=False)
 def get_amenity(amenity_id):
@@ -31,7 +31,7 @@ def get_amenity(amenity_id):
         # Return Amenity object in JSON format
         return jsonify(amenity.to_dict())
     else:
-        # Return 404 error if Amenity object is not found
+        # Return 404 error if Amenity object not found
         abort(404)
 
 
